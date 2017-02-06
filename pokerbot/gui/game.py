@@ -8,9 +8,9 @@ import os
 from pokerbot.poker import poker as ppoker, player as players
 
 FORMAT = '%(name)s - %(message)s'
-logging.basicConfig(format=FORMAT, level=logging.WARN)
+logging.basicConfig(format=FORMAT, level=logging.INFO)
 LOGGER = logging.getLogger("poker-gui")
-LOGGER.setLevel(logging.DEBUG)
+LOGGER.setLevel(logging.ERROR)
 
 event_queue = queue.Queue()
 gui_to_logic_queue = queue.Queue()
@@ -66,7 +66,6 @@ class Menu(tk.Frame):
             widget.grid_forget()
         _players = [PLAYER_TYPES[_type_widget.get()](_name_widget.get(), _cash_widget.get()) for
                     _name_widget, _cash_widget, _type_widget in self.players]
-        LOGGER.debug("Starting game with %d players", len(_players))
         return Game(self, ppoker.Poker(_players))
 
 
@@ -234,7 +233,7 @@ class GUIHumanPlayer(players.BasePlayer):
 
     def __init__(self, name, money):
         super(GUIHumanPlayer, self).__init__(name, money)
-        LOGGER.debug("%s interacting" % self.name)
+        LOGGER.debug("Creating Human player %s" % self.name)
         self.queue = queue.Queue()
         self.player_frame = None
         self.gui = None
@@ -355,16 +354,17 @@ class Game(object):
 PLAYER_TYPES = {c.NAME: c for c in [GUIHumanPlayer, players.RandomPlayer]}
 
 try:
-    from minipoker.logic.ai.aiplayers import SimpleAIPlayer
+    from pokerbot.ai.aiplayers import SimpleAIPlayer, MonteCarloAI
 
     PLAYER_TYPES[SimpleAIPlayer.NAME] = SimpleAIPlayer
+    PLAYER_TYPES[MonteCarloAI.NAME] = MonteCarloAI
 except ImportError:
     print("no ai player")
 
 
 def main():
     root = tk.Tk()
-    root.title("M1N1P0K3R")
+    root.title("PokerBot")
     root.protocol("WM_DELETE_WINDOW", root.destroy)
     Menu(root)
     root.mainloop()

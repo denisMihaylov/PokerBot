@@ -5,15 +5,16 @@ from pokerbot.poker.hands import Hand
 import logging
 
 LOGGER = logging.getLogger("ai-utils")
-LOGGER.setLevel(logging.WARN)
 
 
 def generate_possible_hands(pocket, community_cards):
     return [Hand.get_hand(cards) for cards in itertools.combinations(community_cards + pocket, r=5)]
 
+def get_best_possible_hand(pocket, community_cards):
+    return max(generate_possible_hands(pocket, community_cards))
 
 def naive_rank(pocket, community_cards):
-    print("Evaluating")
+    LOGGER.info("Evaluating")
     pocket = [Card(v, s) for v, s in pocket]
     community_cards = [Card(v, s) for v, s in community_cards]
     unopened_slots = min(3, 7 - len(pocket) - len(community_cards))

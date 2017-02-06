@@ -2,6 +2,7 @@ import logging
 import random
 from pokerbot.ai import utils
 import multiprocessing
+from pokerbot.poker.player import Call, Fold, Bet, Check
 
 pool = multiprocessing.Pool(max(multiprocessing.cpu_count() // 2, 1))
 
@@ -11,7 +12,6 @@ LOGGER = logging.getLogger("ai-strategies")
 class CFRDistribution:
     # need things like "call small raise" ...
     def __init__(self, call, fold, bet, check):
-        from pokerbot.poker.player import Call, Fold, Bet, Check  # can be moved to enum here
         self.call = int(call * 100)
         self.fold = int(fold * 100)
         self.bet = int(bet * 100)
@@ -59,9 +59,8 @@ class SimpleSaneStrategy(PokerStrategy):
             community_v =utils.naive_rank(make_args_from_cards(_round.community_cards), tuple())
             v = v - community_v
         else:
-            print("no community cards, fetching hand value")
-        print("v: %f" % v)
-
+            LOGGER.info("no community cards, fetching hand value")
+        LOGGER.info("v: %f" % v)
         if v < 0.7:
             dist = CFRDistribution(0.05, 0.7, 0.05, 0.2)
         elif v < 1:
@@ -72,7 +71,7 @@ class SimpleSaneStrategy(PokerStrategy):
             dist = CFRDistribution(0.35, 0.1, 0.25, 0.4)
         else:
             dist = CFRDistribution(0.45, 0.05, 0.3, 0.1)
-        print("ai player dist: %s" % dist)
+        LOGGER.info("ai player dist: %s" % dist)
         return dist.decision()
 
 # def randomize_sample(community_count):

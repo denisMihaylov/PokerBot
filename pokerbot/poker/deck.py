@@ -1,5 +1,5 @@
 # coding=utf-8
-from random import shuffle
+from random import shuffle, randint
 
 
 class Suits:
@@ -20,6 +20,11 @@ class Card(object):
     def __init__(self, value, suit):
         self.value = value
         self.suit = suit
+
+    @staticmethod
+    def random_cards(count=1):
+        return [Card(randint(2, 14), Suits.SUITS[randint(0, 3)]) for i in
+            range(count)]
 
     def __gt__(self, other):
         if not isinstance(other, Card):

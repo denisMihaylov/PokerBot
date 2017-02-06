@@ -4,7 +4,6 @@ import logging
 from pokerbot.poker.deck import Deck
 from multiprocessing import Queue
 
-logging.basicConfig()
 LOGGER = logging.getLogger('poker-main')
 
 
@@ -64,7 +63,6 @@ class Round(object):
         self.folded_players = []
         self.small_blind = small_blind
         self.betting_player = None
-        self.pot = None
         self.deck = Deck()
         self.community_cards = []
         self.button_player = button_player
@@ -91,6 +89,7 @@ class Round(object):
         return self.players[(index + 1) % len(self.players)]
 
     def take_blinds(self):
+        LOGGER.info("Taking blinds from players")
         self.small_blind_player().force_bet(self.small_blind, self)
         self.big_blind_player().force_bet(2 * self.small_blind, self)
         return self.betting_player
@@ -135,7 +134,7 @@ class Round(object):
         start = self.betting_player
         candidate = self.after(start)
         while candidate is not start:
-            if candidate.is_betting(self):
+            if candidate.can_bet(self):
                 LOGGER.info("Found betting player %s" % candidate)
                 return candidate
             LOGGER.info("Skipping player %s" % candidate)
@@ -150,7 +149,7 @@ class Round(object):
         for player in self.active_players:
             player.first_bet = True
 
-        if not self.betting_player.is_betting(self):
+        if not self.betting_player.can_bet(self):
             LOGGER.info("Skipping player: %s" % str(self.betting_player))
             self.betting_player = self.next_betting_player()
 
@@ -169,8 +168,6 @@ class Round(object):
         LOGGER.info("Done betting for pre_flop_round")
 
     def play(self):
-
-        LOGGER.info("Playing another round of poker")
 
         self.take_blinds()
 
@@ -276,7 +273,7 @@ class Poker(object):
 
             for player, winning in winnings.items():
                 hand = player.best_hand(round_.community_cards)
-                self.log.append("round %d - %s won %d with %s [%s]" % (
+                self.log.append("Round %d - %s won %d with %s [%s]" % (
                     len(self.rounds) + 1,
                     player.name,
                     winning,

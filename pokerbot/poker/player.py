@@ -5,9 +5,7 @@ from pokerbot.poker.hands import Hand
 import random
 
 
-logging.basicConfig()
 LOGGER = logging.getLogger('poker-players')
-LOGGER.setLevel(logging.WARN)
 
 
 class Action(object):
@@ -95,13 +93,15 @@ class Bet(AmountableAction):
     name = "Bet"
 
     def __init__(self, player, round_, amount=None):
-        # TODO: change bet_max to actual max with respect to round
         bet_min, bet_max = round_.pot.minimum_to_bet(player), player.money
         LOGGER.debug("Setting bet limits to %d-%d" % (bet_min, bet_max))
         # choose action amount (example: bet, 50)
         while (amount is None) or (bet_min > amount or amount > bet_max):
             try:
                 amount = int(player.get_amount(bet_min, bet_max))
+                max_bet = min([player.money for player in round_.active_players])
+                if amount > max_bet:
+                    amount = max_bet
             except ValueError:
                 print("Value has to be between 0 and ")
         LOGGER.debug("Player %s bet: %d" % (player.name, amount))
@@ -179,7 +179,7 @@ class BasePlayer(object):
     def is_folded(self, round_):
         return round_.is_folded(self)
 
-    def is_betting(self, round_):
+    def can_bet(self, round_):
         return len(round_.active_players) > 1 and self.money > 0 and \
             self.first_bet or (
                 not self.is_folded(round_) and
