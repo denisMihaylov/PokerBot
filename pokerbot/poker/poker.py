@@ -37,6 +37,11 @@ class Pot(object):
         ))
         return max(0, self.amount_to_call(player) + self.last_raise)
 
+    def maximum_to_bet(self, player, round_):
+        max_raise = min([player1.money - self.minimum_to_bet(player1)
+            for player1 in round_.active_players])
+        return min(self.minimum_to_bet(player) + max_raise, player.money)
+
     def take_pot_for_player(self, player):
         player_bet = self.player_bet(player)
 

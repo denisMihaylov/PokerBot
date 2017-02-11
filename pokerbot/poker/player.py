@@ -1,5 +1,6 @@
 from itertools import combinations
 import os
+import sys
 import logging
 from pokerbot.poker.hands import Hand
 import random
@@ -79,7 +80,7 @@ class Call(AmountableAction):
 
     @staticmethod
     def is_valid(player, round_):
-        return player.money >= round_.pot.amount_to_call(player)
+        return player.money >= round_.pot.amount_to_call(player) > 0
 
     def apply(self):
         self.player.bet(self.amount, self.round)
@@ -93,24 +94,24 @@ class Bet(AmountableAction):
     name = "Bet"
 
     def __init__(self, player, round_, amount=None):
-        bet_min, bet_max = round_.pot.minimum_to_bet(player), player.money
-        max_raise = min([player1.money - round_.pot.minimum_to_bet(player1)
-            for player1 in round_.active_players])
-        bet_max = min(bet_min + max_raise, player.money)
-        LOGGER.debug("Setting bet limits to %d-%d" % (bet_min, bet_max))
+        bet_min = round_.pot.minimum_to_bet(player)
+        bet_max = round_.pot.maximum_to_bet(player, round_)
+        LOGGER.info("Setting bet limits to %d-%d" % (bet_min, bet_max))
 
         while (amount is None) or (bet_min > amount or amount > bet_max):
             try:
                 amount = int(player.get_amount(bet_min, bet_max))
-            except ValueError:
+            except ValueError as e:
                 LOGGER.error("Error while getting ammount: %s", str(e))
+                sys.exit(0)
         LOGGER.debug("Player %s bet: %d" % (player, amount))
 
         super(Bet, self).__init__(player, round_, amount)
 
     @staticmethod
     def is_valid(player, round_):
-        return player.money >= round_.pot.minimum_to_bet(player)
+        bet_max = round_.pot.maximum_to_bet(player, round_)
+        return bet_max >= round_.pot.minimum_to_bet(player) > 0
 
     def apply(self):
         self.player.money -= self.amount
