@@ -339,7 +339,7 @@ class Game(object):
                 self.refresh_logs()
             self.frame.pack()
         except queue.Empty:
-            LOGGER.error("Error man")
+            pass # No new events
         self.frame.after(10, func=self.process_event_queue)
 
     def refresh_logs(self):
