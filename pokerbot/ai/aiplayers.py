@@ -36,6 +36,7 @@ class MonteCarloAI(BasePlayer):
         my_cards = self.pocket
         players_count = len(round_.active_players)
         wins = [0.0] * players_count
+        LOGGER.debug("Calculating win ration")
         for i in range(0, 100):
             community_cards = round_.community_cards
             community_cards = Card.random_cards(5 - len(community_cards)) + \
@@ -49,11 +50,12 @@ class MonteCarloAI(BasePlayer):
             wins[winner_index] += 1
         available_actions = self.available_actions(round_)
         winner_index = wins.index(max(wins))
+        LOGGER.debug("Win ratio calculated")
         if wins.index(max(wins)) == 0:
-            if Call in available_actions:
-                return Call(self, round_)
             if Bet in available_actions:
                 return Bet(self, round_)
+            if Call in available_actions:
+                return Call(self, round_)
         if Check in available_actions:
             return Check(self, round_)
         if wins[0] / wins[winner_index] > 0.70 and Call in available_actions:

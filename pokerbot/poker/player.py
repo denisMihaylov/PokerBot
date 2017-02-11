@@ -79,7 +79,7 @@ class Call(AmountableAction):
 
     @staticmethod
     def is_valid(player, round_):
-        return player.money >= round_.pot.amount_to_call(player) > 0
+        return player.money >= round_.pot.amount_to_call(player)
 
     def apply(self):
         self.player.bet(self.amount, self.round)
@@ -94,23 +94,23 @@ class Bet(AmountableAction):
 
     def __init__(self, player, round_, amount=None):
         bet_min, bet_max = round_.pot.minimum_to_bet(player), player.money
+        max_raise = min([player1.money - round_.pot.minimum_to_bet(player1)
+            for player1 in round_.active_players])
+        bet_max = min(bet_min + max_raise, player.money)
         LOGGER.debug("Setting bet limits to %d-%d" % (bet_min, bet_max))
-        # choose action amount (example: bet, 50)
+
         while (amount is None) or (bet_min > amount or amount > bet_max):
             try:
                 amount = int(player.get_amount(bet_min, bet_max))
-                max_bet = min([player.money for player in round_.active_players])
-                if amount > max_bet:
-                    amount = max_bet
             except ValueError:
-                print("Value has to be between 0 and ")
-        LOGGER.debug("Player %s bet: %d" % (player.name, amount))
+                LOGGER.error("Error while getting ammount: %s", str(e))
+        LOGGER.debug("Player %s bet: %d" % (player, amount))
 
         super(Bet, self).__init__(player, round_, amount)
 
     @staticmethod
     def is_valid(player, round_):
-        return player.money >= round_.pot.minimum_to_bet(player) > 0
+        return player.money >= round_.pot.minimum_to_bet(player)
 
     def apply(self):
         self.player.money -= self.amount

@@ -13,6 +13,7 @@ class Events:
     CARD_OPENED = "Card opened"
     ROUND_FINISHED = "Round finished"
     PLAYER_BET = "Player bet"
+    GAME_FINISHED = "Game finished"
 
 
 class Pot(object):
@@ -34,7 +35,7 @@ class Pot(object):
         LOGGER.debug("current bet: %d, last raise: %d, player_bet: %d" % (
             self.current_bet, self.last_raise, self.player_bet(player)
         ))
-        return max(1, self.amount_to_call(player) + self.last_raise)
+        return max(0, self.amount_to_call(player) + self.last_raise)
 
     def take_pot_for_player(self, player):
         player_bet = self.player_bet(player)
@@ -155,12 +156,12 @@ class Round(object):
 
         while self.betting_player is not None:
             LOGGER.info("player %s is choosing an action",
-                        self.betting_player.name)
+                        self.betting_player)
             self.betting_player.first_bet = False
             self.event_queue.put(Events.PLAYER_BETTING)
             action = self.betting_player.interact(self.game)
             LOGGER.info("%s chose Action: %s" % (
-                self.betting_player.name, action.__class__.__name__))
+                self.betting_player, action.__class__.__name__))
             self.action_log.append(action)
             action.apply()
             self.betting_player = self.next_betting_player()
@@ -290,7 +291,9 @@ class Poker(object):
                     self.players.remove(player)
 
         winner = self.winner()
-        self.log.append("%s won" % winner.name)
+        self.log.append("%s won the game." % winner)
+        self.event_queue.put(Events.GAME_FINISHED)
+        LOGGER.info("%s won the game.", winner)
         for player in self.players:
             player.on_game_ended(self)
         return self.winner()
