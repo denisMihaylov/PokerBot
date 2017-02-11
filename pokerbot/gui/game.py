@@ -8,9 +8,9 @@ import os
 from pokerbot.poker import poker as ppoker, player as players
 
 FORMAT = '%(name)s - %(message)s'
-logging.basicConfig(format=FORMAT, level=logging.INFO)
+logging.basicConfig(format=FORMAT, level=logging.DEBUG)
 LOGGER = logging.getLogger("poker-gui")
-LOGGER.setLevel(logging.ERROR)
+LOGGER.setLevel(logging.INFO)
 
 event_queue = queue.Queue()
 gui_to_logic_queue = queue.Queue()
@@ -319,8 +319,8 @@ class Game(object):
         # this is needed to let UI thread update widgets
         # (tkinter does not support multi threading)
         try:
-            # LOGGER.debug("processing events") # too much output
             message = self.game_logic.event_queue.get(block=False)
+            LOGGER.info("processing event: %s", message) # too much output
 
             if message:
                 LOGGER.debug("Got event: %s" % str(message))
@@ -339,7 +339,7 @@ class Game(object):
                 self.refresh_logs()
             self.frame.pack()
         except queue.Empty:
-            pass
+            LOGGER.error("Error man")
         self.frame.after(10, func=self.process_event_queue)
 
     def refresh_logs(self):
