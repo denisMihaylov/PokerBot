@@ -93,9 +93,12 @@ class Bet(AmountableAction):
 
     name = "Bet"
 
+    MAX_RAISE = 30
+
     def __init__(self, player, round_, amount=None):
         bet_min = round_.pot.minimum_to_bet(player)
         bet_max = round_.pot.maximum_to_bet(player, round_)
+        bet_max = min(bet_min + Bet.MAX_RAISE, bet_max)
         LOGGER.info("Setting bet limits to %d-%d" % (bet_min, bet_max))
 
         while (amount is None) or (bet_min > amount or amount > bet_max):
