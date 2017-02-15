@@ -1,9 +1,13 @@
 import numpy as np
-from nn import NeuralNetwork
-from analyzer import Analyzer
+from pokerbot.ai.neural_network import NeuralNetwork
+from pokerbot.ai.analyzer import Analyzer
 
-class HoldemAI(NeuralNetwork):
-    def __init__(self, ID):
+from pokerbot.poker.player import BasePlayer
+
+class HoldemAI(NeuralNetwork, BasePlayer):
+    def __init__(self, name, starting_money, ID = None):
+        super(HoldemAI, self).__init__(name, starting_money)
+        super(HoldemAI, self).__init__(name, starting_money)
         super().__init__([31,20,5], ID)
         self.analyzer = Analyzer()
 
