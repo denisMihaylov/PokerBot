@@ -20,6 +20,7 @@ class Pot(object):
     def __init__(self, small_blind):
         self.bets = defaultdict(int)
         self.last_raise = small_blind * 2
+        self.total_pot_money = 0
 
     @property
     def current_bet(self):
@@ -59,6 +60,7 @@ class Pot(object):
     def bet(self, player, amount):
         LOGGER.info("%s bets %d" % (player, amount))
         self.bets[player] += amount
+        self.total_pot_money += amount
 
 
 class Round(object):

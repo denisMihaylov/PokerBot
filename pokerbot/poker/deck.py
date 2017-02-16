@@ -13,7 +13,17 @@ symbols = {
     Suits.SPADES: u'♠ '.encode("utf-8"),
     Suits.HEARTS: u'♥ '.encode("utf-8"),
     Suits.DIAMONDS: u'♦ '.encode("utf-8"),
-    Suits.CLUBS: u'♣ '.encode("utf-8")}
+    Suits.CLUBS: u'♣ '.encode("utf-8")
+}
+
+parsed = {
+    Suits.SPADES: 's',
+    Suits.HEARTS: 'h',
+    Suits.DIAMONDS: 'd',
+    Suits.CLUBS: 'c'
+}
+
+test = ['T', 'J', 'Q', 'K', 'A']
 
 
 class Card(object):
@@ -48,6 +58,14 @@ class Card(object):
         if self.suit in (Suits.HEARTS, Suits.DIAMONDS):
             return "red"
         return "black"
+
+    def parse_value(self):
+        if self.value < 10:
+            return self.value
+        return test[self.value - 10]
+
+    def parse(self):
+        return str(self.parse_value()) + parsed[self.suit]
 
 
 class Deck(object):

@@ -1,4 +1,4 @@
-from deuces.deuces import Deck, Card, Evaluator
+from pokerbot.deuces.deuces import Deck, Card, Evaluator
 
 # hand strength estimator (same class as in https://github.com/neynt/pokertude but uses Deuces Deck, Card and Evaluator classes for the inner workings)
 class Analyzer:

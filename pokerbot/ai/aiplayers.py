@@ -93,8 +93,10 @@ def init_post_flop_table():
         n = full_flop[4]
         hole_id = 0
         for m in range(2, 29):
-            continue if m in flop
-            for n in range(m + 1, )
+            if m in flop:
+                continue
+            for n in range(m + 1, test):
+                pass
             if m < 14:
                 pass
 
@@ -103,5 +105,5 @@ class NeuralAI(BasePlayer):
 
     NAME = "NeuralAI"
 
-    def __init__(self, name, starting_mone)
+    def __init__(self, name, starting_mone):
         pass
