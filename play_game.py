@@ -1,3 +1,4 @@
+# coding=utf-8
 from pokerbot.poker.poker import Poker
 from pokerbot.ai.aiplayers import MonteCarloAI
 from pokerbot.ai.holdemai import HoldemAI

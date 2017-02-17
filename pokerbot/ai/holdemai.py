@@ -1,6 +1,9 @@
 import numpy as np
 from pokerbot.ai.neural_network import NeuralNetwork
-from pokerbot.ai.analyzer import Analyzer
+from pokerbot.ai.analyzer import Analyzer, Card
+from pokerbot.poker.player import Call, Fold, Bet, Check
+
+from pokerbot.deuces.deuces import Card
 
 from pokerbot.poker.player import BasePlayer
 
@@ -9,12 +12,17 @@ class HoldemAI(NeuralNetwork, BasePlayer):
     NAME = "Holdem AI"
 
     def __init__(self, name, starting_money, ID = None):
-        NeuralNetwork.__init__(self, [31, 20, 5], ID)
+        NeuralNetwork.__init__(self, [9, 7, 5], ID)
         BasePlayer.__init__(self, name, starting_money)
         self.analyzer = Analyzer()
 
     def interact(self, _game):
-        pass
+        parsed = self.input_parser(_game)
+        activated = list(self.activate(parsed))
+        activated[-1] = self.rescale_output(activated[-1])
+        #output = self.output_parser(activated, _game)
+        #print("Output:", output)
+        return Fold(self, _game.current_round)
 
     def get_amount(self, _min, _max):
         pass
@@ -28,7 +36,7 @@ class HoldemAI(NeuralNetwork, BasePlayer):
         return self.output_parser(activated, table_state)
 
     def convert_cards(self, cards):
-        return [card.parse() for card in cards]
+        return [Card.new(card.parse()) for card in cards]
 
     def get_win_percent(self, num_opponents, my_cards, community_cards):
         self.analyzer.set_num_opponents(num_opponents)
@@ -41,25 +49,26 @@ class HoldemAI(NeuralNetwork, BasePlayer):
         self.analyzer.reset()
         return win_percent
 
-    def get_hands_until_dealer(self, _round, active_players):
-        diff = active_players.index(self) - active_players.index(_rount.button_player)
+    def get_hands_until_dealer(self, round_, active_players):
+        diff = active_players.index(self) - active_players.index(round_.button_player)
         if diff < 0:
             return len(active_players) + diff
         return diff
 
     # parses table_state from TableProxy into clean (mostly binary) data for neural network
     def input_parser(self, _game):
-        round_ = game.current_round
+        round_ = _game.current_round
+        players = round_.players
         active_players = round_.active_players
-        chips_in_pot = _round.pot.total_pot_money
-        chips_to_call = _round.pot.minimum_to_bet(self)
+        chips_in_pot = round_.pot.total_pot_money
+        chips_to_call = round_.pot.minimum_to_bet(self)
         num_opponents = len(active_players) - 1
 
-        my_cards = convert_cards(self.pocket)
-        community_cards = convert_cards(round_.community_cards)
+        my_cards = self.convert_cards(self.pocket)
+        community_cards = self.convert_cards(round_.community_cards)
 
         win_percent = self.get_win_percent(num_opponents, my_cards, community_cards)
-        hands_until_dealer = self.get_hands_until_dealer(_round, active_players)
+        hands_until_dealer = self.get_hands_until_dealer(round_, active_players)
         my_stack = self.money
 
         # # binary data
@@ -101,16 +110,18 @@ class HoldemAI(NeuralNetwork, BasePlayer):
         inputs_cont = [pot_centered, tocall_centered, num_opponents, win_percent_centered]
 
         # each player addes 1 continuous input, and 2 binary inputs
-        for p in active_players:
+        for p in players:
             #inputs_bin = inputs_bin + p[2] + p[3]
-            inputs_cont = inputs_cont + p.money
+            inputs_cont.append(p.money)
 
         #inputs = HoldemAI.center_bin(inputs_bin) + inputs_cont
+        print(inputs_cont)
+        print(len(inputs_cont))
         return inputs_cont
 
     def rescale_output(self,num):
         # output of neural network is given from -1 to 1, we interpret this as a bet ammount as a percentage of the player's stack
-        return int((num+1)*self.my_stack/2)
+        return int((num+1)*self.money/2)
 
     # parses output for PlayerControl
     def output_parser(self, response, table_state):

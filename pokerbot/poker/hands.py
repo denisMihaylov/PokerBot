@@ -71,9 +71,9 @@ class Hand(object):
         return ", ".join(str(c) for c in self.cards)
 
     def _filter_most_common(self):
-        return filter(
-            lambda a: a != self._values_counter.most_common(1)[0],
-            self.cards)
+        return list(filter(
+            lambda a: a.value != self._values_counter.most_common(1)[0][0],
+            self.cards))
 
     def _compare_highest(self, other):
         return self.cards[-1] > other.cards[-1]

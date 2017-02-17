@@ -10,10 +10,10 @@ class Suits:
     SUITS = (HEARTS, DIAMONDS, CLUBS, SPADES)
 
 symbols = {
-    Suits.SPADES: u'♠ '.encode("utf-8"),
-    Suits.HEARTS: u'♥ '.encode("utf-8"),
-    Suits.DIAMONDS: u'♦ '.encode("utf-8"),
-    Suits.CLUBS: u'♣ '.encode("utf-8")
+    Suits.SPADES: u'♠ '.encode("utf-8").decode(),
+    Suits.HEARTS: u'♥ '.encode("utf-8").decode(),
+    Suits.DIAMONDS: u'♦ '.encode("utf-8").decode(),
+    Suits.CLUBS: u'♣ '.encode("utf-8").decode()
 }
 
 parsed = {
