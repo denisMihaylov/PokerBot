@@ -4,15 +4,15 @@ from threading import Thread, Lock
 import xmlrpc.client
 from xmlrpc.server import SimpleXMLRPCServer
 
-from deuces.deuces import Card, Deck, Evaluator
-from .player import Player
+from pokerbot.deuces.deuces import Card, Deck, Evaluator
+from pokerbot.ai.player import Player
 
 class Table(object):
     BLIND_INCREMENTS = [[10,25],[25,50],[50,100],[75,150],[100,200],[150,300],[200,400],[300,600],[400,800],[500,10000],[600,1200],[800,1600],[1000,2000]]
 
     def __init__(self, seats = 8, quiet = False, training = False):
         self._blind_index = 0
-        [self._smallblind, self._bigblind] = Table.BLIND_INCREMENTS[0]
+        [self._smallblind, self._bigblind] = [2, 4]
         self._deck = Deck()
         self._evaluator = Evaluator()
 
@@ -164,8 +164,9 @@ class Table(object):
         self.reset()
 
     def increment_blinds(self):
-        self._blind_index = min(self._blind_index+1,len(Table.BLIND_INCREMENTS)-1)
-        [self._smallblind, self._bigblind] = Table.BLIND_INCREMENTS[self._blind_index]
+        pass
+        #self._blind_index = min(self._blind_index+1,len(Table.BLIND_INCREMENTS)-1)
+        #[self._smallblind, self._bigblind] = Table.BLIND_INCREMENTS[self._blind_index]
 
     def post_smallblind(self, player):
         if not self._quiet:

@@ -36,7 +36,7 @@ class Pot(object):
         LOGGER.debug("current bet: %d, last raise: %d, player_bet: %d" % (
             self.current_bet, self.last_raise, self.player_bet(player)
         ))
-        return max(0, self.amount_to_call(player) + self.last_raise)
+        return max(0, self.amount_to_call(player) + 2)
 
     def maximum_to_bet(self, player, round_):
         max_raise = min([player1.money - self.minimum_to_bet(player1)
@@ -61,6 +61,7 @@ class Pot(object):
         LOGGER.info("%s bets %d" % (player, amount))
         self.bets[player] += amount
         self.total_pot_money += amount
+        self.last_raise = amount - self.amount_to_call(player)
 
 
 class Round(object):
@@ -240,7 +241,7 @@ class Poker(object):
         self.players = players
 
         self.button_player = choice(self.players)
-        self.small_blind = 1
+        self.small_blind = 15
         self.rounds = []
         self.log = ["STARTING GAME..."]
         self.current_round = None

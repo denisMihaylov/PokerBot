@@ -1,17 +1,22 @@
 import numpy as np
 import os
+import sys
 
 class NeuralNetwork(object):
-    SAVE_DIR = os.getcwd() + '/data/'
+    SAVE_DIR = os.getcwd() + '/pokerbot/data/'
     def __init__(self, dim, networkID, slope = 0.1):
         self.networkID = networkID
         self.dim = list(dim)
         self.num_layers = len(self.dim)
         self.slope = slope
+        self.path = NeuralNetwork.SAVE_DIR + str(networkID)
         try:
             self.weights = np.load(NeuralNetwork.SAVE_DIR + str(networkID)+'_weights.npy')
             self.biases = np.load(NeuralNetwork.SAVE_DIR + str(networkID)+'_biases.npy')
-        except:
+        except Exception as e:
+            print("ERROR")
+            print(e)
+            sys.exit()
             self.weights = [np.random.randn(y,x)/np.sqrt(x) for x,y in zip(self.dim[:-1], self.dim[1:])]
             self.biases = [np.random.randn(y,1) for y in self.dim[1:]]
 

@@ -6,9 +6,9 @@ from collections import OrderedDict
 from threading import Thread, Lock
 from xmlrpc.server import SimpleXMLRPCServer
 
-from .table import Table, TableProxy
-from .nn import NeuralNetwork
-from .playercontrol import PlayerControl, PlayerControlProxy
+from pokerbot.ai.table import Table, TableProxy
+from pokerbot.ai.neural_network import NeuralNetwork
+from pokerbot.ai.playercontrol import PlayerControl, PlayerControlProxy
 
 class Teacher(Thread):
     def __init__(self, seats, n_hof, n_total, n_epochs, quiet = False):

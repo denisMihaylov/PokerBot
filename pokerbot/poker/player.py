@@ -140,6 +140,7 @@ class BasePlayer(object):
         self.money = starting_money
         self.first_bet = False
         self.checked = False
+        self.last_bet = 0
 
     def on_game_ended(self, game):
         pass
@@ -154,9 +155,10 @@ class BasePlayer(object):
         if amount > self.money:
             raise NotEnoughMoneyException(
                 "Player " + self.name + " does not have enough money (" +
-                self.money + "/" + amount + ")"
+                str(self.money) + "/" + str(amount) + ")"
             )
         self.money -= amount
+        self.last_bet = amount
         round_.bet(self, amount)
 
     def force_bet(self, amount, round_):

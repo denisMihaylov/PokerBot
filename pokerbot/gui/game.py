@@ -8,9 +8,9 @@ import os
 from pokerbot.poker import poker as ppoker, player as players
 
 FORMAT = '%(name)s - %(message)s'
-logging.basicConfig(format=FORMAT, level=logging.DEBUG)
+logging.basicConfig(format=FORMAT, level=logging.ERROR)
 LOGGER = logging.getLogger("poker-gui")
-LOGGER.setLevel(logging.INFO)
+#LOGGER.setLevel(logging.DEBUG)
 
 event_queue = queue.Queue()
 gui_to_logic_queue = queue.Queue()
@@ -210,18 +210,18 @@ class GUIPlayer(tk.Frame):
             self.pot['text'] = _round.pot.player_bet(self.player)
             self.cash_label['text'] = "%d" % self.player.money
             if self.is_pc or self.player is not _round.betting_player:
-                self.pocket1['text'] = u'\u258A'.encode("utf-8").decode()
-                self.pocket1['fg'] = "black"
-                self.pocket2['text'] = u'\u258A'.encode("utf-8").decode()
-                self.pocket2['fg'] = "black"
+                #self.pocket1['text'] = u'\u258A'.encode("utf-8").decode()
+                #self.pocket1['fg'] = "black"
+                #self.pocket2['text'] = u'\u258A'.encode("utf-8").decode()
+                #self.pocket2['fg'] = "black"
                 self.disable()
-            else:
+            #else:
                 # show cards
-                if self.player.pocket:
-                    self.pocket1['text'] = self.player.pocket[0]
-                    self.pocket1['fg'] = self.player.pocket[0].color()
-                    self.pocket2['text'] = self.player.pocket[1]
-                    self.pocket2['fg'] = self.player.pocket[1].color()
+            if self.player.pocket:
+                self.pocket1['text'] = self.player.pocket[0]
+                self.pocket1['fg'] = self.player.pocket[0].color()
+                self.pocket2['text'] = self.player.pocket[1]
+                self.pocket2['fg'] = self.player.pocket[1].color()
 
     def disable(self):
         for move_button in self.move_buttons.values():
