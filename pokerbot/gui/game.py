@@ -210,9 +210,9 @@ class GUIPlayer(tk.Frame):
             self.pot['text'] = _round.pot.player_bet(self.player)
             self.cash_label['text'] = "%d" % self.player.money
             if self.is_pc or self.player is not _round.betting_player:
-                self.pocket1['text'] = u'\u258A'.encode("utf-8")
+                self.pocket1['text'] = u'\u258A'.encode("utf-8").decode()
                 self.pocket1['fg'] = "black"
-                self.pocket2['text'] = u'\u258A'.encode("utf-8")
+                self.pocket2['text'] = u'\u258A'.encode("utf-8").decode()
                 self.pocket2['fg'] = "black"
                 self.disable()
             else:
@@ -355,9 +355,11 @@ PLAYER_TYPES = {c.NAME: c for c in [GUIHumanPlayer, players.RandomPlayer]}
 
 try:
     from pokerbot.ai.aiplayers import SimpleAIPlayer, MonteCarloAI
+    from pokerbot.ai.holdemai import HoldemAI
 
     PLAYER_TYPES[SimpleAIPlayer.NAME] = SimpleAIPlayer
     PLAYER_TYPES[MonteCarloAI.NAME] = MonteCarloAI
+    PLAYER_TYPES[HoldemAI.NAME] = HoldemAI
 except ImportError:
     print("no ai player")
 
